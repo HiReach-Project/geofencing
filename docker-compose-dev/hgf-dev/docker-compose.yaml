@@ -1,0 +1,18 @@
+version: "3.5"
+services:
+  tile:
+    container_name: hgf-dev-tile
+    image: tile38/tile38
+    restart: unless-stopped
+
+  express:
+    container_name: hgf-dev-express
+    image: node:12.18.0-alpine3.12
+    working_dir: /var/www/data
+    command: tail -f /dev/null
+    volumes:
+      - ../../:/var/www/data
+    ports:
+      - "8000:80"
+    depends_on:
+      - tile

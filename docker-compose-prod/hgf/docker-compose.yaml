@@ -1,0 +1,16 @@
+version: "3.5"
+services:
+  tile:
+    container_name: hgf-tile
+    image: tile38/tile38
+    restart: unless-stopped
+
+  express:
+    container_name: hgf-express
+    build:
+      context: ../../
+      dockerfile: ./docker-compose-prod/hgf/build/express/Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - tile
