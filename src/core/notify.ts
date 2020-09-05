@@ -7,15 +7,15 @@ import admin from "firebase-admin";
 
 const notify = async (targetId: string | number, data: PutTargetResponse) => {
     if (data.checkFenceAreaResult.notifyOutOfFence || data.checkFenceAreaResult.notifyReachedDestination) {
-        await triggerNotification(targetId, data.checkFenceAreaResult.mesage);
+        await triggerNotification(targetId, data.checkFenceAreaResult.message);
     }
 
     if (data.checkCustomAreasResult.notifyReachedCustomArea) {
-        await triggerNotification(targetId, data.checkCustomAreasResult.mesage);
+        await triggerNotification(targetId, data.checkCustomAreasResult.message);
     }
 
     if (data.checkTimetableCustomAreasResult.notifyEarlyArrival || data.checkTimetableCustomAreasResult.notifyLateArrival || data.checkTimetableCustomAreasResult.notifyNoArrival) {
-        await triggerNotification(targetId, data.checkTimetableCustomAreasResult.mesage);
+        await triggerNotification(targetId, data.checkTimetableCustomAreasResult.message);
     }
 };
 

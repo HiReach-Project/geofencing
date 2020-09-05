@@ -1,6 +1,6 @@
 export interface CustomConfig {
     timeTableErrorMinutes?: number;
-    offFenceAreaNotificationIntervalMiutes?: number;
+    offFenceAreaNotificationIntervalMinutes?: number;
     fenceNearbyRetry?: number;
     fenceAreaBorderMeters?: number;
     fenceAreaBetweenPointsMeters?: number;

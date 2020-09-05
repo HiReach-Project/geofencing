@@ -24,31 +24,31 @@ app.use(cors())
 app.use("/target", target);
 app.use("/supervisor", supervisor);
 
-app.get("/", HandleHttp(async (request, repsonse) => {
-    const response: any = {
+app.get("/", HandleHttp(async (request, response) => {
+    const res: any = {
         status: `ok`,
         message: `App runs on port ${ config.port }`,
         data: {}
     };
 
-    response.data.keys = await tile.keys("*");
-    response.data.target = await scan("target");
-    response.data.targetCustomConfig = await scan("targetCustomConfig");
-    response.data.targetSessionStatus = await scan("targetSessionStatus");
-    response.data.targetName = await scan("targetName");
-    response.data.targetFenceArea = await scan("targetFenceArea");
-    response.data.targetFenceCustomAreas = await scan("targetFenceCustomAreas");
-    response.data.targetTimetableCustomAreas = await scan("targetTimetableCustomAreas");
-    response.data.targetFenceNearbyRetry = await scan("targetFenceNearbyRetry");
-    response.data.targetNotificationFenceArea = await scan("targetNotificationFenceArea");
-    response.data.targetNotificationCustomAreas = await scan("targetNotificationCustomAreas");
-    response.data.targetNotificationTimetableCustomAreas = await scan("targetNotificationTimetableCustomAreas");
-    response.data.targetLateNotificationTimetableCustomAreas = await scan("targetLateNotificationTimetableCustomAreas");
-    response.data.supervisor = await scan("supervisor");
-    response.data.targetSupervisor = await scan("targetSupervisor");
+    res.data.keys = await tile.keys("*");
+    res.data.target = await scan("target");
+    res.data.targetCustomConfig = await scan("targetCustomConfig");
+    res.data.targetSessionStatus = await scan("targetSessionStatus");
+    res.data.targetName = await scan("targetName");
+    res.data.targetFenceArea = await scan("targetFenceArea");
+    res.data.targetFenceCustomAreas = await scan("targetFenceCustomAreas");
+    res.data.targetTimetableCustomAreas = await scan("targetTimetableCustomAreas");
+    res.data.targetFenceNearbyRetry = await scan("targetFenceNearbyRetry");
+    res.data.targetNotificationFenceArea = await scan("targetNotificationFenceArea");
+    res.data.targetNotificationCustomAreas = await scan("targetNotificationCustomAreas");
+    res.data.targetNotificationTimetableCustomAreas = await scan("targetNotificationTimetableCustomAreas");
+    res.data.targetLateNotificationTimetableCustomAreas = await scan("targetLateNotificationTimetableCustomAreas");
+    res.data.supervisor = await scan("supervisor");
+    res.data.targetSupervisor = await scan("targetSupervisor");
 
-    repsonse.status(200);
-    repsonse.json(response);
+    response.status(200);
+    response.json(res);
 }));
 
 app.get("/flush", HandleHttp(async (request, response) => {

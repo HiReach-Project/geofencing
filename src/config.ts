@@ -5,7 +5,7 @@ import { Config } from "./models/config";
 
 const customConfig: CustomConfig = {
     timeTableErrorMinutes: 10,
-    offFenceAreaNotificationIntervalMiutes: 3,
+    offFenceAreaNotificationIntervalMinutes: 3,
     fenceNearbyRetry: 5,
     fenceAreaBorderMeters: 50,
     fenceAreaBetweenPointsMeters: 20,

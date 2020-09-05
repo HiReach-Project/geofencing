@@ -5,11 +5,11 @@ export class PutTargetResponse {
     checkFenceAreaResult: {
         notifyReachedDestination: boolean,
         notifyOutOfFence: boolean,
-        mesage: string
+        message: string
     };
     checkCustomAreasResult: {
         notifyReachedCustomArea: boolean,
-        mesage: string,
+        message: string,
         customArea: CustomArea | null
     };
     checkTimetableCustomAreasResult: {
@@ -17,7 +17,7 @@ export class PutTargetResponse {
         notifyNoArrival: boolean,
         notifyLateArrival: boolean,
         notifyEarlyArrival: boolean,
-        mesage: string,
+        message: string,
         timetableCustomArea: null | TimetableCustomArea
     };
 }

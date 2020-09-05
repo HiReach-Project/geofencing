@@ -10,7 +10,7 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
     const response = {
         notifyReachedDestination: false,
         notifyOutOfFence: false,
-        mesage: ""
+        message: ""
     };
 
     let fenceArea = await get("targetFenceArea", id) as Position[];
@@ -40,7 +40,7 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
             .execute();
         if (nearByEnd.count) {
             response.notifyReachedDestination = true;
-            response.mesage = await getNotifyMessage("notifyReachedDestination", { id });
+            response.message = await getNotifyMessage("notifyReachedDestination", { id });
             await stopFencingSession(id);
             return response;
         }
@@ -51,9 +51,9 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
             fenceNearbyRetry++;
         } else {
             const currentTime = Date.now();
-            if (!notificationFenceArea || currentTime - notificationFenceArea >= config.offFenceAreaNotificationIntervalMiutes * 60000) {
+            if (!notificationFenceArea || currentTime - notificationFenceArea >= config.offFenceAreaNotificationIntervalMinutes * 60000) {
                 response.notifyOutOfFence = true;
-                response.mesage = await getNotifyMessage("notifyOutOfFence", { id });
+                response.message = await getNotifyMessage("notifyOutOfFence", { id });
                 await set('targetNotificationFenceArea', id, currentTime);
             }
         }
@@ -68,7 +68,7 @@ const checkCustomAreas = async (id: string | number, config: CustomConfig) => {
     const response = {
         customArea: null,
         notifyReachedCustomArea: false,
-        mesage: ""
+        message: ""
     };
 
     const customAreas = await get('targetFenceCustomAreas', id) as CustomArea[];
@@ -84,7 +84,7 @@ const checkCustomAreas = async (id: string | number, config: CustomConfig) => {
 
         response.customArea = customArea;
         response.notifyReachedCustomArea = true;
-        response.mesage = await getNotifyMessage("notifyReachedCustomArea", { id, customArea });
+        response.message = await getNotifyMessage("notifyReachedCustomArea", { id, customArea });
 
         notificationCustomArea.push(JSON.stringify(customArea.position));
         await set('targetNotificationCustomAreas', id, notificationCustomArea);
@@ -102,7 +102,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
         notifyLateArrival: false,
         notifyNoArrival: false,
         notifyEarlyArrival: false,
-        mesage: ""
+        message: ""
     };
 
     const timetableCustomAreas = await get('targetTimetableCustomAreas', id) as TimetableCustomArea[];
@@ -126,7 +126,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             response.notifyLateArrival = true;
             response.currentTime = time;
             response.timetableCustomArea = timetableCustomArea;
-            response.mesage = await getNotifyMessage("notifyLateArrival", { id, timetableCustomArea, time });
+            response.message = await getNotifyMessage("notifyLateArrival", { id, timetableCustomArea, time });
 
             lateNotificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetLateNotificationTimetableCustomAreas", id, lateNotificationTimetableCustomAreas);
@@ -139,7 +139,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             response.notifyNoArrival = true;
             response.currentTime = time;
             response.timetableCustomArea = timetableCustomArea;
-            response.mesage = await getNotifyMessage("notifyNoArrival", { id, timetableCustomArea });
+            response.message = await getNotifyMessage("notifyNoArrival", { id, timetableCustomArea });
 
             notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetNotificationTimetableCustomAreas", id, notificationTimetableCustomAreas);
@@ -150,7 +150,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             response.notifyEarlyArrival = true;
             response.currentTime = time;
             response.timetableCustomArea = timetableCustomArea;
-            response.mesage = await getNotifyMessage("notifyEarlyArrival", { id, timetableCustomArea, time });
+            response.message = await getNotifyMessage("notifyEarlyArrival", { id, timetableCustomArea, time });
 
             notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetNotificationTimetableCustomAreas", id, notificationTimetableCustomAreas);

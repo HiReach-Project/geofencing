@@ -33,7 +33,7 @@ const validatePutDeleteSupervisorParams = async (params: PutDeleteTargetSupervis
         throw new CustomError("supervisorId is required and must be string or number");
 
     if (checkSupervisor) {
-        const supervisor = await get("supervisor", params.supervisorId)
+        const supervisor = await get("supervisor", params.supervisorId);
         if (!supervisor) throw new CustomError("This supervisor does not exist", { supervisorId: params.supervisorId });
     }
 
@@ -61,7 +61,7 @@ const validatePostTargetParams = async (params: PostTarget) => {
         if (!['area', 'customAreas', 'timetableCustomAreas'].includes(key)) {
             throw new CustomError("Property doesn't exist in fence object", {
                 property: key
-            })
+            });
         }
     });
 
@@ -88,7 +88,7 @@ const validatePostTargetParams = async (params: PostTarget) => {
                 if (!['name', 'position'].includes(key)) {
                     throw new CustomError("Property doesn't exist in fence.customArea object", {
                         property: key
-                    })
+                    });
                 }
             });
 
@@ -101,7 +101,7 @@ const validatePostTargetParams = async (params: PostTarget) => {
             });
 
             if (customArea.name && typeof customArea.name !== 'string')
-                throw new CustomError("customArea.name must be string")
+                throw new CustomError("customArea.name must be string");
         }
     }
 
@@ -117,7 +117,7 @@ const validatePostTargetParams = async (params: PostTarget) => {
                 if (!['name', 'position', 'time', 'error'].includes(key)) {
                     throw new CustomError("Property doesn't exist in fence.timetableCustomArea object", {
                         property: key
-                    })
+                    });
                 }
             });
 
@@ -136,13 +136,13 @@ const validatePostTargetParams = async (params: PostTarget) => {
                 throw new CustomError("timetableCustomArea.error must be number >= 0");
 
             if (timetableCustomArea.name && typeof timetableCustomArea.name !== 'string')
-                throw new CustomError("timetableCustomArea.name must be string")
+                throw new CustomError("timetableCustomArea.name must be string");
         }
     }
 };
 
 const isValidTimestamp = (timestamp) => {
-    const newTimestamp = new Date(timestamp).getTime()
+    const newTimestamp = new Date(timestamp).getTime();
     return !isNaN(newTimestamp) && isFinite(newTimestamp);
 }
 
@@ -150,9 +150,9 @@ const validateCustomConfig = (customConf: CustomConfig) => {
     if (!customConf || typeof customConf !== 'object') throw new CustomError("customConfig must be an object");
 
     Object.keys(customConf).forEach(key => {
-        if (!['timeTableErrorMinutes', 'offFenceAreaNotificationIntervalMiutes', 'fenceNearbyRetry', 'fenceAreaBorderMeters',
+        if (!['timeTableErrorMinutes', 'offFenceAreaNotificationIntervalMinutes', 'fenceNearbyRetry', 'fenceAreaBorderMeters',
             'fenceAreaBetweenPointsMeters', 'customAreaRadiusMeters', 'notifyMessageLanguage', 'targetName',].includes(key)) {
-            throw new CustomError("Property doesn't exist in customConfig object", { property: key })
+            throw new CustomError("Property doesn't exist in customConfig object", { property: key });
         }
 
         if (key === 'targetName') {
