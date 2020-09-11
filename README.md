@@ -508,8 +508,31 @@ POST /supervisor [Content-Type application/json; charset=utf-8]
 #### Request body / params example
 
 ```json
-
+{
+    "id":1,
+    "subscription" : {
+        "webPush" : {},
+        "firebase" : {}
+    }
+}
 ```
+`id : required`
+- Represents the supervisor id.
+
+`subscription : required`
+- A list of two possible subscription type, `webPush` the browser / workers based push system and `firebase` based on firebase cloud service.
+
+`subscription.webPush | subscription.firebase : optional`
+- These two params are optional but at least 1 must be provided.
+- They must be valid web push based on VAPID key token or firebase valid token for push notification.
+
+[Web Push Notifications Docs](https://developers.google.com/web/fundamentals/codelabs/push-notifications)
+
+[Firebase Cloud Messaging - Push Notifications Docs](https://firebase.google.com/docs/cloud-messaging)
+
+**!Note**
+
+The api won't check validity of tokens but the push system will fail to send notification and the error will be logged. Check `/push-errors` route description below.
 
 ### Success response
 
