@@ -27,22 +27,23 @@ import webpush from "web-push";
 import { notifyTitle } from "../notify-messages";
 import { Subscription } from "../models/subscription";
 import admin from "firebase-admin";
+import fs from "fs";
 
-const notify = async (targetId: string | number, data: PutTargetResponse) => {
+const notify = (targetId: string | number, data: PutTargetResponse) => {
     if (data.checkFenceAreaResult.notifyOutOfFence || data.checkFenceAreaResult.notifyReachedDestination) {
-        await triggerNotification(targetId, data.checkFenceAreaResult.notifyMessage);
+        triggerNotification(targetId, data.checkFenceAreaResult.notifyMessage).then();
     }
 
     if (data.checkCustomAreasResult.notifyReachedCustomArea) {
-        await triggerNotification(targetId, data.checkCustomAreasResult.notifyMessage);
+        triggerNotification(targetId, data.checkCustomAreasResult.notifyMessage).then();
     }
 
     if (data.checkTimetableCustomAreasResult.notifyEarlyArrival || data.checkTimetableCustomAreasResult.notifyLateArrival || data.checkTimetableCustomAreasResult.notifyNoArrival) {
-        await triggerNotification(targetId, data.checkTimetableCustomAreasResult.notifyMessage);
+        triggerNotification(targetId, data.checkTimetableCustomAreasResult.notifyMessage).then();
     }
 
     if (data.checkSameLocation.notifySameLocation) {
-        await triggerNotification(targetId, data.checkTimetableCustomAreasResult.notifyMessage);
+        triggerNotification(targetId, data.checkTimetableCustomAreasResult.notifyMessage).then();
     }
 };
 
@@ -50,7 +51,12 @@ const triggerNotification = async (targetId: string | number, message: string) =
     if (!isWebPushAvailable() && !isFirebaseAvailable()) return;
 
     const targetSupervisorIds = await get("targetSupervisor", targetId);
-    if (!targetSupervisorIds) return;
+
+    if (!targetSupervisorIds) {
+        const e = new Error(`Target with id ${ targetId } doesn't have supervisors`)
+        logPushError("custom", { name: e.name, message: e.message, stack: e.stack });
+        return;
+    }
 
     const notification = {
         title: notifyTitle,
@@ -60,16 +66,41 @@ const triggerNotification = async (targetId: string | number, message: string) =
     for (let targetSupervisorId of targetSupervisorIds) {
         const supervisor = await get("supervisor", targetSupervisorId) as Subscription;
 
-        if (supervisor.webPush && supervisor.webPush.endpoint && supervisor.webPush.keys && supervisor.webPush.keys.auth && supervisor.webPush.keys.p256dh)
-            webpush.sendNotification(supervisor.webPush, JSON.stringify(notification)).catch(e => console.warn(e));
+        if (!supervisor) {
+            const e = new Error(`Supervisor  with id ${ targetSupervisorId } doesn't exist`)
+            logPushError("custom", { name: e.name, message: e.message, stack: e.stack });
+            return;
+        }
+
+        if (supervisor.webPush) {
+            try {
+                await webpush.sendNotification(supervisor.webPush, JSON.stringify(notification));
+            } catch (e) {
+                logPushError("webpush", { name: e.name, message: e.message, stack: e.stack });
+            }
+        }
 
         if (supervisor.firebase) {
-            admin.messaging().send({
-                notification: notification,
-                token: supervisor.firebase
-            }).catch(e => console.warn(e));
+            try {
+                await admin.messaging().send({ notification: notification, token: supervisor.firebase });
+            } catch (e) {
+                logPushError("firebase", { name: e.name, message: e.message, stack: e.stack });
+            }
         }
     }
 };
 
+type PushTypeModel = "webpush" | "firebase" | "custom";
+
+const logPushError = (errorType: PushTypeModel, error: { [key: string]: any }) => {
+    const date = new Date();
+    const errorObject = { date, errorType, error };
+    const fileName = `${ date.getDate() }-${ date.getMonth() }-${ date.getFullYear() }.txt`;
+    const path = `${ process.cwd() }/push-logs/${ fileName }`;
+    const content = JSON.stringify(errorObject)
+
+    fs.appendFile(path, `${ content }%separator%`, function (err) {
+        if (err) throw err;
+    });
+}
 export { notify, triggerNotification };

@@ -470,6 +470,9 @@ DELETE /target/supervisor [Content-Type application/json; charset=utf-8]
 `supervisorId : required`
 - Represents the supervisor id.
 
+**!Note**
+Removing a supervisor from a user will still keep the supervisor credentials in database.
+
 ### Success response
 
 Status 200
@@ -496,3 +499,86 @@ Status 400 : Bad request
 ```
 
 `error`  `data`  `stack` values depend on the fail reason.
+
+### Add supervisor
+
+```http 
+POST /supervisor [Content-Type application/json; charset=utf-8]
+```
+#### Request body / params example
+
+```json
+
+```
+
+### Success response
+
+Status 200
+
+```json
+{
+    "message": "Supervisor added!",
+    "data": {},
+    "ok": true
+}
+```
+
+### Error response
+
+Status 400 : Bad request
+
+```json
+{
+    "ok": false,
+    "error": "supervisorId is required and must be string or number",
+    "data": {},
+    "stack": "Error: supervisorId is required and must be string or number at Object.validatePutDeleteSupervisorParams (/var/www/data/src/validators/target.ts:57:15) at /var/www/data/src/controller/target.ts:139:11 at /var/www/data/src/core/handle-http.ts:31:19 at Layer.handle [as handle_request] (/var/www/data/node_modules/express/lib/router/layer.js:95:5) at next (/var/www/data/node_modules/express/lib/router/route.js:137:13) at Route.dispatch (/var/www/data/node_modules/express/lib/router/route.js:112:3) at Layer.handle [as handle_request] (/var/www/data/node_modules/express/lib/router/layer.js:95:5) at /var/www/data/node_modules/express/lib/router/index.js:281:22 at Function.process_params (/var/www/data/node_modules/express/lib/router/index.js:335:12) at next (/var/www/data/node_modules/express/lib/router/index.js:275:10)"
+}
+```
+
+`error`  `data`  `stack` values depend on the fail reason.
+
+### Get push system related errors
+
+```http 
+GET /push-errors/:date
+```
+
+#### Examples
+
+```
+curl -X GET http://localhost:8000/push-errors/all
+curl -X GET http://localhost:8000/push-errors/11-8-2020
+curl -X GET http://localhost:8000/push-errors/1-7-2020
+```
+
+**!Note**
+
+Push notification module is async and the logs will be stored in files.
+Files are named like this : `day-month-year.txt` and the day and month will have 1 digit if < 10.
+
+#### Placeholders
+
+```
+:date 
+```
+- This placeholder can be the file name which is the day date in format `day-month-year.txt` or `all`.
+- If the placeholder is the file name then only file's content will be returned.
+- If the placeholder is `all` then all the files content will be returned.
+
+### Success response
+
+Status 200
+
+Will contain array of objects | array of array of objects | empty array.
+
+### Error response
+
+Status 404 : not found
+
+```json
+{ 
+  "message": "File not found",
+   "result": []
+ }
+```

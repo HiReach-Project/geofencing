@@ -43,7 +43,7 @@ const configDev: Config = {
             auth_provider_x509_cert_url: "",
             client_x509_cert_url: ""
         },
-        databaseUrl: ""
+        databaseUrl: "https://hireach-test-push-notification.firebaseio.com"
     },
     tileHost: 'tile'
 };

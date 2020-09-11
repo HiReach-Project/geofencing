@@ -77,11 +77,9 @@ router.post('', HandleHttp(async (request, response) => {
         let message = "";
         if (customConf.notifyFenceStartedStatus) {
             message = await getNotifyMessage('notifyFenceStarted', {
-                id: params.id,
-                time: Date.now()
+                id: params.id
             });
-
-            await triggerNotification(params.id, message);
+            triggerNotification(params.id, message).then();
         }
 
         response.status(200);
@@ -108,7 +106,7 @@ router.put('', HandleHttp(async (request, response) => {
     data.checkTimetableCustomAreasResult = await checkTimetableCustomAreas(params.id, customConf);
     data.checkSameLocation = await checkSameLocation(params.id, customConf);
 
-    await notify(params.id, data);
+    notify(params.id, data);
     response.status(200);
     response.json(new CustomResponse("Target updated", data));
 }));

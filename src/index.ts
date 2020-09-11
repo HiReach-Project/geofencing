@@ -34,6 +34,7 @@ import HandleHttp from "./core/handle-http";
 import { scan } from "./core/helpers";
 import { validateCustomConfig } from "./validators/target";
 import { validateNotifyMessages } from "./validators/notify-messages";
+import fs from "fs";
 
 const app = express();
 
@@ -72,6 +73,66 @@ app.get("/", HandleHttp(async (request, response) => {
 
     response.status(200);
     response.json(res);
+}));
+
+app.get("/push-errors/:date", HandleHttp(async (request, response) => {
+    const date = request.params.date;
+    if (date === 'all') {
+        const promises = [];
+        fs.readdir(`${ process.cwd() }/push-logs`, (err, filenames) => {
+            if (err) {
+                response.status(400);
+                response.json(err);
+                return;
+            }
+
+            filenames.forEach(filename => {
+                const promise = new Promise((resolve, reject) => {
+                    fs.readFile(`${ process.cwd() }/push-logs/${ filename }`, { encoding: 'utf-8' }, (err, content) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        resolve(content);
+                    });
+                });
+                promises.push(promise);
+            });
+            
+            Promise.all(promises).then(logs => {
+                const result = logs.map(log => {
+                    let finalData = log.split('%separator%');
+                    finalData.pop();
+                    return finalData.map(text => JSON.parse(text));
+                })
+                response.status(200)
+                response.json(result)
+            }).catch(e => {
+                response.status(400);
+                response.json(e);
+            });
+        });
+    } else {
+        const path = `${ process.cwd() }/push-logs/${ date }.txt`;
+
+        if (!fs.existsSync(path)) {
+            response.status(404);
+            response.json({ message: "File not found", result: [] });
+        }
+
+        fs.readFile(path, { encoding: 'utf-8' }, (err, content) => {
+            if (!err) {
+                let finalData = content.split('%separator%');
+                finalData.pop();
+                finalData = finalData.map(text => JSON.parse(text));
+                response.status(200)
+                response.json(finalData)
+            } else {
+                response.status(400);
+                response.json(err)
+            }
+        });
+    }
 }));
 
 app.get("/flush", HandleHttp(async (request, response) => {
