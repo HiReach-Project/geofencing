@@ -1,3 +1,26 @@
+/* Geofencing API - a NodeJs + Redis API designed to monitor travelers
+during a planned trip.
+
+Copyright (C) 2020, University Politehnica of Bucharest, member
+of the HiReach Project consortium <https://hireach-project.eu/>
+<andrei[dot]gheorghiu[at]upb[dot]ro. This project has received
+funding from the European Union’s Horizon 2020 research and
+innovation programme under grant agreement no. 769819.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { PutTarget } from "../models/params/put-target";
 import { CustomError } from "../core/custom-error";
 import { get, set } from "../core/helpers";
@@ -6,6 +29,7 @@ import { PostTarget } from "../models/params/post-target";
 import { CustomConfig } from "../models/custom-config";
 import inBetween from "../core/in-between";
 import tile from "../core/tile-client";
+import { customConfig } from "../config";
 
 const validatePutTargetParams = async (params: PutTarget) => {
     const isFenceOn = await get("targetSessionStatus", params.id);
@@ -149,9 +173,10 @@ const isValidTimestamp = (timestamp) => {
 const validateCustomConfig = (customConf: CustomConfig) => {
     if (!customConf || typeof customConf !== 'object') throw new CustomError("customConfig must be an object");
 
+    const customConfigKeys = Object.keys(customConfig);
+
     Object.keys(customConf).forEach(key => {
-        if (!['timeTableErrorMinutes', 'offFenceAreaNotificationIntervalMinutes', 'fenceNearbyRetry', 'fenceAreaBorderMeters',
-            'fenceAreaBetweenPointsMeters', 'customAreaRadiusMeters', 'notifyMessageLanguage', 'targetName',].includes(key)) {
+        if (!customConfigKeys.includes(key)) {
             throw new CustomError("Property doesn't exist in customConfig object", { property: key });
         }
 
@@ -159,6 +184,8 @@ const validateCustomConfig = (customConf: CustomConfig) => {
             if (typeof customConf[key] !== 'string') throw new CustomError(`${ key } must be string`);
         } else if (key === 'notifyMessageLanguage') {
             if (!customConf[key] || typeof customConf[key] !== 'string') throw new CustomError(`${ key } must be string and must not be empty`);
+        } else if (key === 'notifyFenceStartedStatus' || key === 'notifyReachedDestinationStatus' || key === 'notifyLateArrivalStatus' || key === 'notifyEarlyArrivalStatus' || key === 'notifySameLocationStatus') {
+            if (typeof customConf[key] !== 'boolean') throw new CustomError(`${ key } must be a boolean`);
         } else {
             if (!customConf[key] || typeof customConf[key] !== 'number' || customConf[key] < 1) throw new CustomError(`${ key } must be a number > 0`);
         }

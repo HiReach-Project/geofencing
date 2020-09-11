@@ -7,11 +7,12 @@
     "tsc": "tsc",
     "tsc:watch": "tsc --watch",
     "start:docker:dev": "npm install && npm install -g typescript pm2 && npm run tsc && pm2 start ecosystem.config.js && echo \"Go to localhost:8000\"",
-    "serve:dev": "pm2 start ecosystem.config.js && echo \"Go to localhost:8000\" "
+    "serve:dev": "pm2 start ecosystem.config.js && echo \"Go to localhost:8000\" ",
+    "serve:prod": "npm run tsc && pm2-runtime ecosystem.config.js --env production"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GNU",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -22,7 +23,6 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.7",
-    "@types/web-push": "^3.3.0",
-    "nodemon": "^2.0.4"
+    "@types/web-push": "^3.3.0"
   }
 }

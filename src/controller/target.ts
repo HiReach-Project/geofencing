@@ -1,5 +1,28 @@
+/* Geofencing API - a NodeJs + Redis API designed to monitor travelers
+during a planned trip.
+
+Copyright (C) 2020, University Politehnica of Bucharest, member
+of the HiReach Project consortium <https://hireach-project.eu/>
+<andrei[dot]gheorghiu[at]upb[dot]ro. This project has received
+funding from the European Union’s Horizon 2020 research and
+innovation programme under grant agreement no. 769819.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import express from 'express';
-import { checkCustomAreas, checkFenceArea, checkTimetableCustomAreas } from "../core/target-checks";
+import { checkCustomAreas, checkFenceArea, checkSameLocation, checkTimetableCustomAreas } from "../core/target-checks";
 import { addSupervisor, removeSupervisor } from "../core/target-supervisor";
 import HandleHttp from "../core/handle-http";
 import inBetween from "../core/in-between";
@@ -31,7 +54,6 @@ router.post('', HandleHttp(async (request, response) => {
         await stopFencingSession(params.id);
         response.json(new CustomResponse("Session status updated", {
             sessionStatus: params.isFencingOn,
-            notifyFenceStarted: false,
         }));
     } else {
         if (params.customConfig) validateCustomConfig(params.customConfig);
@@ -49,18 +71,24 @@ router.post('', HandleHttp(async (request, response) => {
         await set("targetNotificationCustomAreas", params.id, []);
         await set("targetNotificationTimetableCustomAreas", params.id, []);
         await set("targetLateNotificationTimetableCustomAreas", params.id, []);
+        await set("targetLastLocation", params.id, []);
 
-        await triggerNotification(params.id, await getNotifyMessage('notifyFenceStarted', {
-            id: params.id,
-            time: Date.now()
-        }));
+
+        let message = "";
+        if (customConf.notifyFenceStartedStatus) {
+            message = await getNotifyMessage('notifyFenceStarted', {
+                id: params.id,
+                time: Date.now()
+            });
+
+            await triggerNotification(params.id, message);
+        }
 
         response.status(200);
         response.json(new CustomResponse("Session status updated", {
             sessionStatus: params.isFencingOn,
-            notifyFenceStarted: true,
-            targetId: params.id,
-            targetName: customConf.targetName || ''
+            notifyFenceStarted: customConf.notifyFenceStartedStatus,
+            notifyMessage: message
         }));
     }
 }));
@@ -78,10 +106,21 @@ router.put('', HandleHttp(async (request, response) => {
     data.checkFenceAreaResult = await checkFenceArea(params.id, customConf);
     data.checkCustomAreasResult = await checkCustomAreas(params.id, customConf);
     data.checkTimetableCustomAreasResult = await checkTimetableCustomAreas(params.id, customConf);
+    data.checkSameLocation = await checkSameLocation(params.id, customConf);
 
     await notify(params.id, data);
     response.status(200);
     response.json(new CustomResponse("Target updated", data));
+}));
+
+router.put('/custom-config', HandleHttp(async (request, response) => {
+    const params: { id: string | number, customConfig: CustomConfig } = request.body;
+    validateCustomConfig(params.customConfig);
+
+    await set("targetCustomConfig", params.id, await generateCustomConfig(params.customConfig, params.id));
+
+    response.status(200);
+    response.json(new CustomResponse("Target custom config updated!"));
 }));
 
 router.put("/supervisor", HandleHttp(async (request, response) => {
@@ -102,16 +141,6 @@ router.delete("/supervisor", HandleHttp(async (request, response) => {
 
     response.status(200);
     response.json(new CustomResponse("Supervisor removed from target"));
-}));
-
-router.put('/custom-config', HandleHttp(async (request, response) => {
-    const params: { id: string | number, customConfig: CustomConfig } = request.body;
-    validateCustomConfig(params.customConfig);
-
-    await set("targetCustomConfig", params.id, await generateCustomConfig(params.customConfig, params.id));
-
-    response.status(200);
-    response.json(new CustomResponse("Target custom config updated!"));
 }));
 
 export default router;

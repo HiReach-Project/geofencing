@@ -7,10 +7,8 @@ COPY ./ecosystem.config.js .
 COPY ./tsconfig.json .
 COPY src ./src
 
-RUN npm install --producton &&\
-    npm install -g typescript pm2 &&\
-    npm run tsc
+RUN npm install --producton && npm install -g typescript pm2
 
 EXPOSE 80
 
-CMD pm2-runtime ecosystem.config.js --env production
+ENTRYPOINT npm run serve:prod

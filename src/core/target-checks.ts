@@ -1,3 +1,26 @@
+/* Geofencing API - a NodeJs + Redis API designed to monitor travelers
+during a planned trip.
+
+Copyright (C) 2020, University Politehnica of Bucharest, member
+of the HiReach Project consortium <https://hireach-project.eu/>
+<andrei[dot]gheorghiu[at]upb[dot]ro. This project has received
+funding from the European Union’s Horizon 2020 research and
+innovation programme under grant agreement no. 769819.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import tile from "./tile-client";
 import { get, set, stopFencingSession } from "./helpers";
 import { TimetableCustomArea } from "../models/timetable-custom-area";
@@ -10,7 +33,8 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
     const response = {
         notifyReachedDestination: false,
         notifyOutOfFence: false,
-        message: ""
+        reachedDestination: false,
+        notifyMessage: ""
     };
 
     let fenceArea = await get("targetFenceArea", id) as Position[];
@@ -35,12 +59,15 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
         const nearByEnd = await tile.nearbyQuery("target")
             .point(
                 fenceArea[fenceArea.length - 1][0],
-                fenceArea[fenceArea.length - 1][1], 30)
+                fenceArea[fenceArea.length - 1][1], 20)
             .match(id)
             .execute();
         if (nearByEnd.count) {
-            response.notifyReachedDestination = true;
-            response.message = await getNotifyMessage("notifyReachedDestination", { id });
+            if (config.notifyReachedDestinationStatus) {
+                response.notifyReachedDestination = true;
+                response.notifyMessage = await getNotifyMessage("notifyReachedDestination", { id });
+            }
+            response.reachedDestination = true;
             await stopFencingSession(id);
             return response;
         }
@@ -53,7 +80,7 @@ const checkFenceArea = async (id: string | number, config: CustomConfig) => {
             const currentTime = Date.now();
             if (!notificationFenceArea || currentTime - notificationFenceArea >= config.offFenceAreaNotificationIntervalMinutes * 60000) {
                 response.notifyOutOfFence = true;
-                response.message = await getNotifyMessage("notifyOutOfFence", { id });
+                response.notifyMessage = await getNotifyMessage("notifyOutOfFence", { id });
                 await set('targetNotificationFenceArea', id, currentTime);
             }
         }
@@ -68,7 +95,7 @@ const checkCustomAreas = async (id: string | number, config: CustomConfig) => {
     const response = {
         customArea: null,
         notifyReachedCustomArea: false,
-        message: ""
+        notifyMessage: ""
     };
 
     const customAreas = await get('targetFenceCustomAreas', id) as CustomArea[];
@@ -84,7 +111,7 @@ const checkCustomAreas = async (id: string | number, config: CustomConfig) => {
 
         response.customArea = customArea;
         response.notifyReachedCustomArea = true;
-        response.message = await getNotifyMessage("notifyReachedCustomArea", { id, customArea });
+        response.notifyMessage = await getNotifyMessage("notifyReachedCustomArea", { id, customArea });
 
         notificationCustomArea.push(JSON.stringify(customArea.position));
         await set('targetNotificationCustomAreas', id, notificationCustomArea);
@@ -102,7 +129,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
         notifyLateArrival: false,
         notifyNoArrival: false,
         notifyEarlyArrival: false,
-        message: ""
+        notifyMessage: ""
     };
 
     const timetableCustomAreas = await get('targetTimetableCustomAreas', id) as TimetableCustomArea[];
@@ -122,11 +149,12 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             .execute();
 
         if (lateNotificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) break;
-        if (nearBy.count && time - timetableCustomArea.time > (timetableCustomArea.error + 1 || config.timeTableErrorMinutes + 1) * 60000) {
+
+        if (config.notifyLateArrivalStatus && nearBy.count && time - timetableCustomArea.time > (timetableCustomArea.error + 1 || config.timeTableErrorMinutes + 1) * 60000) {
             response.notifyLateArrival = true;
             response.currentTime = time;
             response.timetableCustomArea = timetableCustomArea;
-            response.message = await getNotifyMessage("notifyLateArrival", { id, timetableCustomArea, time });
+            response.notifyMessage = await getNotifyMessage("notifyLateArrival", { id, timetableCustomArea, time });
 
             lateNotificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetLateNotificationTimetableCustomAreas", id, lateNotificationTimetableCustomAreas);
@@ -139,7 +167,7 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             response.notifyNoArrival = true;
             response.currentTime = time;
             response.timetableCustomArea = timetableCustomArea;
-            response.message = await getNotifyMessage("notifyNoArrival", { id, timetableCustomArea });
+            response.notifyMessage = await getNotifyMessage("notifyNoArrival", { id, timetableCustomArea });
 
             notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetNotificationTimetableCustomAreas", id, notificationTimetableCustomAreas);
@@ -147,10 +175,12 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
         }
 
         if (nearBy.count && time < timetableCustomArea.time) {
-            response.notifyEarlyArrival = true;
-            response.currentTime = time;
-            response.timetableCustomArea = timetableCustomArea;
-            response.message = await getNotifyMessage("notifyEarlyArrival", { id, timetableCustomArea, time });
+            if (config.notifyEarlyArrivalStatus) {
+                response.notifyEarlyArrival = true;
+                response.currentTime = time;
+                response.timetableCustomArea = timetableCustomArea;
+                response.notifyMessage = await getNotifyMessage("notifyEarlyArrival", { id, timetableCustomArea, time });
+            }
 
             notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
             await set("targetNotificationTimetableCustomAreas", id, notificationTimetableCustomAreas);
@@ -161,4 +191,38 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
     return response;
 };
 
-export { checkFenceArea, checkCustomAreas, checkTimetableCustomAreas };
+const checkSameLocation = async (id: string | number, config: CustomConfig | null = null) => {
+    const response = {
+        notifySameLocation: false,
+        notifyMessage: ""
+    };
+
+    if (!config.notifySameLocationStatus) return response;
+
+    const lastLocation = await get("targetLastLocation", id);
+    let target;
+
+    if (!lastLocation.length) {
+        target = await get("target", id);
+        await set("targetLastLocation", id, [target.coordinates, Date.now()]);
+        return response;
+    }
+
+    const nearBy = await tile.nearbyQuery("target").point(lastLocation[0][1], lastLocation[0][0], 7).match(id).execute();
+
+    if (!nearBy.count) {
+        target = await get("target", id);
+        await set("targetLastLocation", id, [target.coordinates, Date.now()]);
+        return response;
+    }
+
+    if (Date.now() - lastLocation[1] >= 60000 * config.sameLocationTime) {
+        await set("targetLastLocation", id, [lastLocation[0], Date.now()]);
+        response.notifySameLocation = true;
+        response.notifyMessage = await getNotifyMessage("notifySameLocation", { id });
+    }
+
+    return response;
+}
+
+export { checkFenceArea, checkCustomAreas, checkTimetableCustomAreas, checkSameLocation };
