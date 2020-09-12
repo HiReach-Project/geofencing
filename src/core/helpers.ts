@@ -115,7 +115,8 @@ const isFirebaseAvailable = () => {
         config.firebase.credential.auth_uri &&
         config.firebase.credential.token_uri &&
         config.firebase.credential.auth_provider_x509_cert_url &&
-        config.firebase.credential.client_x509_cert_url
+        config.firebase.credential.client_x509_cert_url &&
+        config.firebase.databaseUrl;
 }
 
 export {

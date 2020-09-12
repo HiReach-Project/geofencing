@@ -98,7 +98,7 @@ app.get("/push-errors/:date", HandleHttp(async (request, response) => {
                 });
                 promises.push(promise);
             });
-            
+
             Promise.all(promises).then(logs => {
                 const result = logs.map(log => {
                     let finalData = log.split('%separator%');

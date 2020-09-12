@@ -26,9 +26,27 @@ import { CustomError } from "../core/custom-error";
 import { customConfig } from "../config";
 
 const validateNotifyMessages = () => {
+    if (!customConfig.notifyMessageLanguage) customConfig.notifyMessageLanguage = 'en';
+
     if (!Object.keys(notifyMessages).length) throw new CustomError("notifyMessages must have at least one entry");
     if (!notifyMessages[customConfig.notifyMessageLanguage]) throw new CustomError("notifyMessages doesn't have entry for language specified in customConfig", {
         "customConfig.notifyMessageLanguage": customConfig.notifyMessageLanguage
+    });
+
+    const notifyMessagesTypes = ['notifyOutOfFence', 'notifyReachedCustomArea', 'notifyNoArrival', 'notifyLateArrival', 'notifyEarlyArrival', 'notifyReachedDestination', 'notifyFenceStarted', 'notifySameLocation'];
+
+    Object.keys(notifyMessages).forEach(language => {
+        const languageMessages = notifyMessages[language];
+
+        if (typeof languageMessages !== "object") throw new CustomError("Each language in notifyMessages must be an object");
+
+        Object.keys(languageMessages).forEach(messageType => {
+            if (!notifyMessagesTypes.includes(messageType)) throw new CustomError(`${ messageType } is not a property of notifyMessages['language'] object`);
+        });
+
+        notifyMessagesTypes.forEach(type => {
+            if (!languageMessages[type]) throw new CustomError(`${ type } was nod defined for language ${ language } in notifyMessages object`);
+        });
     })
 }
 

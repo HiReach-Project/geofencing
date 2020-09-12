@@ -179,7 +179,11 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
                 response.notifyEarlyArrival = true;
                 response.currentTime = time;
                 response.timetableCustomArea = timetableCustomArea;
-                response.notifyMessage = await getNotifyMessage("notifyEarlyArrival", { id, timetableCustomArea, time });
+                response.notifyMessage = await getNotifyMessage("notifyEarlyArrival", {
+                    id,
+                    timetableCustomArea,
+                    time
+                });
             }
 
             notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));

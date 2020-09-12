@@ -51,6 +51,10 @@ const getNotifyMessage = async (notifyType: notifyType, needle: Needle) => {
         sameLocationTime: customConf.sameLocationTime
     }
 
+    if (!customConf.notifyMessageLanguage && !customConfig.notifyMessageLanguage) {
+        customConfig.notifyMessageLanguage = 'en';
+    }
+
     const languageMessages = notifyMessages[customConf.notifyMessageLanguage] || notifyMessages[customConfig.notifyMessageLanguage];
     let message = languageMessages[notifyType];
 
