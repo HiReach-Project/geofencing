@@ -88,6 +88,7 @@ const stopFencingSession = async (id: string | number) => {
     await set("targetNotificationCustomAreas", id, []);
     await set("targetNotificationTimetableCustomAreas", id, []);
     await set("targetLateNotificationTimetableCustomAreas", id, []);
+    await set("targetEarlyNotificationTimetableCustomAreas", id, []);
     await set("tempLocation", id, [0, 0]);
     await set("targetLastLocation", id, []);
 };

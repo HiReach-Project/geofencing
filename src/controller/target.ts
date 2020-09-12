@@ -71,6 +71,7 @@ router.post('', HandleHttp(async (request, response) => {
         await set("targetNotificationCustomAreas", params.id, []);
         await set("targetNotificationTimetableCustomAreas", params.id, []);
         await set("targetLateNotificationTimetableCustomAreas", params.id, []);
+        await set("targetEarlyNotificationTimetableCustomAreas", params.id, []);
         await set("targetLastLocation", params.id, []);
 
 

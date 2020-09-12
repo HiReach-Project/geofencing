@@ -68,6 +68,7 @@ app.get("/", HandleHttp(async (request, response) => {
     res.data.targetNotificationCustomAreas = await scan("targetNotificationCustomAreas");
     res.data.targetNotificationTimetableCustomAreas = await scan("targetNotificationTimetableCustomAreas");
     res.data.targetLateNotificationTimetableCustomAreas = await scan("targetLateNotificationTimetableCustomAreas");
+    res.data.targetEarlyNotificationTimetableCustomAreas = await scan("targetEarlyNotificationTimetableCustomAreas");
     res.data.supervisor = await scan("supervisor");
     res.data.targetSupervisor = await scan("targetSupervisor");
 

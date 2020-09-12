@@ -137,11 +137,12 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
 
     const notificationTimetableCustomAreas = await get('targetNotificationTimetableCustomAreas', id) as string[];
     const lateNotificationTimetableCustomAreas = await get('targetLateNotificationTimetableCustomAreas', id) as string[];
+    const earlyNotificationTimetableCustomAreas = await get('targetEarlyNotificationTimetableCustomAreas', id) as string[];
     const time = Date.now();
 
     for (let timetableCustomArea of timetableCustomAreas) {
+        if (earlyNotificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
         if (lateNotificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
-        if (notificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
 
         const nearBy = await tile.nearbyQuery("target")
             .point(
@@ -161,6 +162,8 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             await set("targetLateNotificationTimetableCustomAreas", id, lateNotificationTimetableCustomAreas);
             break;
         }
+
+        if (notificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
 
         if (!nearBy.count && time - timetableCustomArea.time > (timetableCustomArea.error + 1 || config.timeTableErrorMinutes + 1) * 60000) {
             response.notifyNoArrival = true;
@@ -185,8 +188,8 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
                 });
             }
 
-            notificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
-            await set("targetNotificationTimetableCustomAreas", id, notificationTimetableCustomAreas);
+            earlyNotificationTimetableCustomAreas.push(JSON.stringify(timetableCustomArea.position));
+            await set("targetEarlyNotificationTimetableCustomAreas", id, earlyNotificationTimetableCustomAreas);
             break;
         }
     }
