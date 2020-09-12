@@ -140,6 +140,9 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
     const time = Date.now();
 
     for (let timetableCustomArea of timetableCustomAreas) {
+        if (lateNotificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
+        if (notificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) continue;
+
         const nearBy = await tile.nearbyQuery("target")
             .point(
                 timetableCustomArea.position[0],
@@ -147,8 +150,6 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
                 config.customAreaRadiusMeters)
             .match(id)
             .execute();
-
-        if (lateNotificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) break;
 
         if (config.notifyLateArrivalStatus && nearBy.count && time - timetableCustomArea.time > (timetableCustomArea.error + 1 || config.timeTableErrorMinutes + 1) * 60000) {
             response.notifyLateArrival = true;
@@ -160,8 +161,6 @@ const checkTimetableCustomAreas = async (id: string | number, config: CustomConf
             await set("targetLateNotificationTimetableCustomAreas", id, lateNotificationTimetableCustomAreas);
             break;
         }
-
-        if (notificationTimetableCustomAreas.includes(JSON.stringify(timetableCustomArea.position))) break;
 
         if (!nearBy.count && time - timetableCustomArea.time > (timetableCustomArea.error + 1 || config.timeTableErrorMinutes + 1) * 60000) {
             response.notifyNoArrival = true;
