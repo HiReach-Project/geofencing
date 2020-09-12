@@ -43,7 +43,7 @@ const notify = (targetId: string | number, data: PutTargetResponse) => {
     }
 
     if (data.checkSameLocation.notifySameLocation) {
-        triggerNotification(targetId, data.checkTimetableCustomAreasResult.notifyMessage).then();
+        triggerNotification(targetId, data.checkSameLocation.notifyMessage).then();
     }
 };
 
