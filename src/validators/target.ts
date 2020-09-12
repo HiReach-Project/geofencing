@@ -60,9 +60,6 @@ const validatePutDeleteSupervisorParams = async (params: PutDeleteTargetSupervis
         const supervisor = await get("supervisor", params.supervisorId);
         if (!supervisor) throw new CustomError("This supervisor does not exist", { supervisorId: params.supervisorId });
     }
-
-    const target = await get("target", params.targetId);
-    if (!target) throw new CustomError("This target does not exist", { targetId: params.targetId });
 }
 
 const validatePostTargetParams = async (params: PostTarget) => {

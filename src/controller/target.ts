@@ -74,7 +74,6 @@ router.post('', HandleHttp(async (request, response) => {
         await set("targetEarlyNotificationTimetableCustomAreas", params.id, []);
         await set("targetLastLocation", params.id, []);
 
-
         let message = "";
         if (customConf.notifyFenceStartedStatus) {
             message = await getNotifyMessage('notifyFenceStarted', {
