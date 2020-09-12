@@ -215,7 +215,7 @@ const validateFenceValues = async (params: PostTarget, customConf: CustomConfig)
         for (let position of fenceArea) {
             const nearBy = await tile.nearbyQuery("tempLocation")
                 .point(position[0], position[1], customConf.fenceAreaBorderMeters)
-                .match(1)
+                .match(params.id)
                 .execute();
             if ((isNear = nearBy.count)) break;
         }
