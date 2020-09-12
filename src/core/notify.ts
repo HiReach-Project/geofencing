@@ -52,11 +52,7 @@ const triggerNotification = async (targetId: string | number, message: string) =
 
     const targetSupervisorIds = await get("targetSupervisor", targetId);
 
-    if (!targetSupervisorIds) {
-        const e = new Error(`Target with id ${ targetId } doesn't have supervisors`)
-        logPushError("custom", { name: e.name, message: e.message, stack: e.stack });
-        return;
-    }
+    if (!targetSupervisorIds) return;
 
     const notification = {
         title: notifyTitle,
