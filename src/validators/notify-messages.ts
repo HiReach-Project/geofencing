@@ -28,7 +28,7 @@ import { customConfig } from "../config";
 const validateNotifyMessages = () => {
     if (!customConfig.notifyMessageLanguage) customConfig.notifyMessageLanguage = 'en';
 
-    if (!Object.keys(notifyMessages).length) throw new CustomError("notifyMessages must have at least one entry");
+    if (!notifyMessages['en']) throw new CustomError("notifyMessages must have at least one entry for English language defined on 'en' key");
     if (!notifyMessages[customConfig.notifyMessageLanguage]) throw new CustomError("notifyMessages doesn't have entry for language specified in customConfig", {
         "customConfig.notifyMessageLanguage": customConfig.notifyMessageLanguage
     });
