@@ -55,8 +55,12 @@ const scan = async (collection: string) => {
     return result
 };
 
-const getTimeDifference = (time: number, timetableCustomArea: TimetableCustomArea) => {
-    let unixTime = time > timetableCustomArea.time ? time - timetableCustomArea.time : timetableCustomArea.time - time;
+const getTimeDifference = (time: number, timetableCustomArea: TimetableCustomArea, customConf: CustomConfig) => {
+    const timetableCustomAreaTime = timetableCustomArea.error ?
+        timetableCustomArea.time + timetableCustomArea.error * 60000 :
+        timetableCustomArea.time + customConf.timeTableErrorMinutes * 60000;
+
+    let unixTime = time > timetableCustomAreaTime ? time - timetableCustomAreaTime : timetableCustomAreaTime - time;
     let seconds = (unixTime / 1000).toFixed(0);
     let minutes: number | string = Math.floor(parseInt(seconds) / 60);
     let hours = '';

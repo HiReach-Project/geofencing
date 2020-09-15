@@ -39,7 +39,7 @@ type notifyType =
     | "notifySameLocation";
 
 const getNotifyMessage = async (notifyType: notifyType, needle: Needle) => {
-    if (!needle.id) throw new CustomError("needle.id is required for notify mesasges");
+    if (!needle.id) throw new CustomError("needle.id is required for notify messages");
 
     const customConf: CustomConfig = await generateCustomConfig(undefined, needle.id);
 
@@ -47,7 +47,7 @@ const getNotifyMessage = async (notifyType: notifyType, needle: Needle) => {
         id: customConf.targetName || needle.id,
         customArea: needle.customArea ? needle.customArea.name || JSON.stringify(needle.customArea.position) : '',
         timetableCustomArea: needle.timetableCustomArea ? needle.timetableCustomArea.name || JSON.stringify(needle.timetableCustomArea.position) : '',
-        timeDifference: needle.time && needle.timetableCustomArea ? getTimeDifference(needle.time, needle.timetableCustomArea) : '',
+        timeDifference: needle.time && needle.timetableCustomArea ? getTimeDifference(needle.time, needle.timetableCustomArea, customConf) : '',
         sameLocationTime: customConf.sameLocationTime
     }
 
