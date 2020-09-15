@@ -56,6 +56,15 @@ To be able to receive web push notifications, please update the `webPush` proper
 
 These credentials are used for test purposes only and making the private key public is not an issue.
 
+In `/public/index.js` in function `initGeofence` edit the `time` property value for `payload.fence.timetableCustomAreas` with proper unix timestamp value.
+
+```
+"timetableCustomAreas": [
+    { "name": "Orange Dot", "position": [44.430735, 26.110162], "time": 1600167600000, "error": 10 },
+    { "name": "Blue Dot", "position": [44.430432, 26.115065], "time": 1600142400000, "error": 10 }
+]
+``` 
+
 ## Generating Predefined Route
 Tile38 is used as a helper to detect if a certain position is in a certain area or more areas intersect one with each other.
 
