@@ -184,7 +184,7 @@ const validateCustomConfig = (customConf: CustomConfig) => {
         } else if (key === 'notifyFenceStartedStatus' || key === 'notifyReachedDestinationStatus' || key === 'notifyLateArrivalStatus' || key === 'notifyEarlyArrivalStatus' || key === 'notifySameLocationStatus') {
             if (typeof customConf[key] !== 'boolean') throw new CustomError(`${ key } must be a boolean`);
         } else {
-            if (!customConf[key] || typeof customConf[key] !== 'number' || customConf[key] < 1) throw new CustomError(`${ key } must be a number > 0`);
+            if (!customConf[key] || typeof customConf[key] !== 'number' || customConf[key] < 1) throw new CustomError(`${ key } must be a number >= 1`);
         }
     });
 

@@ -38,7 +38,7 @@ const notifyMessages: NotifyMessages = {
         notifyEarlyArrival: `${ target } reached ${ timetableCustomArea } ${ timeDifference } earlier.`,
         notifyReachedDestination: `${ target } reached the destination`,
         notifyFenceStarted: `${ target } started a new fence session`,
-        notifySameLocation: `${ target } is in the same location for ${ sameLocationTime } minutes!`
+        notifySameLocation: `${ target } is in the same location for ${ sameLocationTime } minute(s)!`
     }
 }
 
