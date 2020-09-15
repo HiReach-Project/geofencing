@@ -44,7 +44,7 @@ Using standalone images requires an extra setup for this functionality.
 
 ## Demo
 
-The public directory contains a demo web app.
+The public directory contains a demo web app. To access it after the project is up go to [localhost:8000/demo.html](localhost:8000/demo.html).
 
 To be able to receive web push notifications, please update the `webPush` property in `config-development | config-production` file with the following credentials.
 
