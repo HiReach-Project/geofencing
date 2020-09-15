@@ -60,7 +60,7 @@ const getTimeDifference = (time: number, timetableCustomArea: TimetableCustomAre
         timetableCustomArea.time + timetableCustomArea.error * 60000 :
         timetableCustomArea.time + customConf.timeTableErrorMinutes * 60000;
 
-    let unixTime = time > timetableCustomAreaTime ? time - timetableCustomAreaTime : timetableCustomAreaTime - time;
+    let unixTime = time > timetableCustomAreaTime ? time - timetableCustomAreaTime : timetableCustomArea.time - time;
     let seconds = (unixTime / 1000).toFixed(0);
     let minutes: number | string = Math.floor(parseInt(seconds) / 60);
     let hours = '';
