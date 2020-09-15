@@ -71,11 +71,11 @@
         </div>
         <div>
             <button onclick="initGeofence()">Init Geofence</button>
-            <span>A notification should be sent about the fact that a new geofence session started.</span>
+            <span>A notification will be sent informing us that a new geofence session started.</span>
         </div>
         <div>
             <button onclick="blueAreaNoArrival()" style="background: #d68a77">No Arrival</button>
-            <span>This will place the target somewhere between A point and Green Area and a notification should be sent about the fact that the target didn't reach <strong>Blue Area</strong> in time. The expected arrival time for Blue Area is between 07:00:00 AM and 07:10:00 AM GMT+03</span>
+            <span>This will place the target somewhere between the starting point and Green Area and a notification will be sent informing us that the target didn't reach <strong>Blue Area</strong> in time. The expected arrival time for Blue Area is between 07:00:00 AM and 07:10:00 AM GMT+03</span>
         </div>
         <div>
             <button onclick="greenAreaArrival()" style="background: #22b14c">Green Area</button>
@@ -91,15 +91,15 @@
         </div>
         <div>
             <button onclick="purpleAreaOffRoad()" style="background: #a349a4">Purple Area</button>
-            <span>This is a point outside the fence area and will trigger a notification <strong>after 5 consecutive tries</strong> about the fact the user is Off Fence Area.</span>
+            <span>This is a point outside the fence area and will trigger a notification <strong>after 3 consecutive tries</strong> informing us that the user is Off Fence Area.</span>
         </div>
         <div>
             <button onclick="redAreaSameSpot()" style="background: #ed1c24">Red Area</button>
-            <span>This will place the target in the Red Area and <strong>after 1 minute </strong>will send a notification if the target is in the same place about the fact that the target stays too much in the same spot.</span>
+            <span>This will place the target in the Red Area and <strong>after 1 minute </strong>will send a notification informing us that the target stays too much in the same spot.</span>
         </div>
         <div>
             <button onclick="endAreaReachedDestination()">End Area</button>
-            <span>This is the end of the route, this will trigger a notification about the fact the target reached the destination.</span>
+            <span>This is the end of the route, this will trigger a notification informing us that the target reached the destination.</span>
         </div>
     </div>
 </div>

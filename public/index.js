@@ -25,7 +25,7 @@ const initGeofence = async () => {
         "customConfig": {
             "timeTableErrorMinutes": 10,
             "offFenceAreaNotificationIntervalMinutes": 1,
-            "fenceNearbyRetry": 5,
+            "fenceNearbyRetry": 3,
             "fenceAreaBorderMeters": 30,
             "fenceAreaBetweenPointsMeters": 15,
             "customAreaRadiusMeters": 15,
@@ -388,3 +388,4 @@ let targetCircle = L.circle([44.430755, 26.10621], {
     fillOpacity: 1,
     radius: 10
 }).addTo(map);
+targetCircle.bindPopup('John Doe');
