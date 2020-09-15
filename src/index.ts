@@ -157,4 +157,6 @@ app.get("/delete/:key/:id", HandleHttp(async (request, response) => {
     }
 }));
 
+app.use(express.static(process.cwd() + '/public'));
+
 app.listen(config.port || 80);
