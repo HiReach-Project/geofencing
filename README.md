@@ -15,6 +15,8 @@ The API is able to detect and inform in real time using the push notification sy
 
 The api comes with a large list of configurable variables for each person like controlling what notifications to be triggered, specific messages for each event with support for multiple languages or  parameters for geofence accuracy, also it will return valuable information during the geofence session which can be used for tracking history, reports or in app custom notification system.
 
+### You can find here a less technical documentation : ![Documentation PDF](./Geofencing API documentation.pdf) 
+
 ## How to run / use the API.
 
 For production run the following commands in docker-compose-prod/hgf:
